@@ -1,0 +1,9 @@
+$(function(){
+    $('.out').click(function(){
+        //清除名为isLogin的cookie,跳转到前台登录页面
+        //清除cookie
+        Cookies.remove('isLogin')
+        //并且退回到登录页面
+        window.location.href="/login";
+    })
+})

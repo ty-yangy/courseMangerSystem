@@ -1,0 +1,190 @@
+var express=require('express')
+var cookie=require('cookie');
+var bodyParser=require('body-parser');
+var courseModel=require('../../models/courseModel')
+var mysql=require('../../libs/mysql')
+var result=require('../../libs/result')
+var router=express.Router()
+//课程管理列表业务逻辑开始***
+router.get('/list',function(req,res){
+    var cookie_obj = cookie.parse(req.headers.cookie || '');
+    if(cookie_obj.roles==='adminstrator'){
+        res.render('admin/course_list')
+    }else{
+        res.render('admin/error')
+    } 
+    
+})
+router.get('/getCourseList',function(req,res){
+    courseModel.getCourseList(function(data){
+        if(data){
+            res.json(result.createResult('success',data))
+        }else{
+            res.json(result.createResult('error','出现错误'))
+        }
+    })
+})
+//课程管理列表业务逻辑开始***
+//课程添加业务逻辑开始***
+router.get('/add',function(req,res){
+    var cookie_obj = cookie.parse(req.headers.cookie || '');
+    if(cookie_obj.roles==='adminstrator'){
+        res.render('admin/course_add')
+    }else{
+        res.render('admin/error')
+    }   
+})
+//验证名称是否存在
+router.get('/checkCourseName',function(req,res){
+    courseModel.checkNameExist([req.query.name],function(data){
+        if(data){
+            res.json(result.createResult('error','课程名称已存在'))
+        }else{
+            res.json(result.createResult('success','可以添加'))
+        }
+    })
+})
+router.post('/saveCourseInfo',function(req,res){
+    var arr=[];
+    for(var i in req.body){
+        arr.push(req.body[i]);
+    }
+    courseModel.saveCourseInfo(arr,function(data){
+        if(data.affectedRows){
+            res.json(result.createResult('success','添加成功'))
+        }else{
+            res.json(result.createResult('error','出现错误'))
+        }
+    })
+})
+//课程添加业务逻辑结束***
+//编辑课程业务逻辑开始***
+router.get('/edit',function(req,res){
+    var cookie_obj = cookie.parse(req.headers.cookie || '');
+    if(cookie_obj.roles==='adminstrator'){
+        res.render('admin/course_edit')
+    }else{
+        res.render('admin/error');
+    }   
+    
+})
+router.post('/editInfo',function(req,res){
+    courseModel.returnIdByName([req.body.name],function(data){
+        if(data){
+            res.json(result.createResult('success',data.id))
+        }else{
+            res.json(result.createResult('error','出现错误'))
+        }
+    })
+})
+//根据传到edit页面的id值,将id所在行信息显示到页面.
+router.post('/getInfoCourseInitPage',function(req,res){
+    //接受前端发送来的数据,查询id所在行,并将查到数据返回给前端 
+    courseModel.findByIdCourse([req.body.id],function(data){
+        //找到有相对应的那行的信息,把那行信息显示到edit页面上.
+        if(data){
+            res.json(result.createResult('success',data));
+        }else{
+            res.json(result.createResult('error','出现错误'));
+        }
+    })
+})
+//查询classify表中的所有categoryName的数据
+router.get('/getAllCategoryNameFromClassify',function(req,res){
+    courseModel.getAllCategoryName(function(data){
+        //得到的data是一个数组,数组每一项是一个对象.
+        if(data.length){
+            res.json(result.createResult('success',data))
+        }else{
+            res.json(result.createResult('error','出现错误'))
+        }
+    })
+})
+router.post('/editCourseSave',function(req,res){
+    var arr=[];
+    for(var i in req.body){
+        arr.push(req.body[i]);
+    }
+    courseModel.saveEditInfo(arr,function(data){
+        if(data.affectedRows){
+            res.json(result.createResult('success','编辑成功'))
+        }else{
+            res.json(result.createResult('error','编辑失败'))
+        }
+    })
+})
+//编辑课程业务逻辑结束***
+//删除课程管理业务逻辑开始***
+router.get('/deleteCourse',function(req,res){
+    courseModel.deleteCourse([req.query.name],function(data){
+        if(data.affectedRows){
+            res.json(result.createResult('success','删除成功'))
+        }else{
+            res.json(result.createResult('error','删除失败'))
+        }
+    })
+})
+//删除课程管理业务逻辑结束***
+//以下是从前台页面发送过来的请求
+//基础课程
+router.get('/getFoundationCourse',function(req,res){
+    courseModel.getSorting([req.query.sorting],function(data){
+        if(data){
+            res.json(result.createResult('success',data))
+        }else{
+            res.json(result.createResult('error','出现错误'))
+        }
+    })
+})
+//进阶实战
+router.get('/getProgressCourse',function(req,res){
+    courseModel.getSorting([req.query.sorting],function(data){
+        if(data){
+            res.json(result.createResult('success',data))
+        }else{
+            res.json(result.createResult('error','出现错误'))
+        }
+    })
+})
+//高级修炼
+router.get('/getSeniorCourse',function(req,res){
+    courseModel.getSorting([req.query.sorting],function(data){
+        if(data){
+            res.json(result.createResult('success',data))
+        }else{
+            res.json(result.createResult('error','出现错误'))
+        }
+    })
+})
+//战力强化
+router.get('/getStrengthenCourse',function(req,res){
+    courseModel.getSorting([req.query.sorting],function(data){
+        if(data){
+            res.json(result.createResult('success',data))
+        }else{
+            res.json(result.createResult('error','出现错误'))
+        }
+    })
+})
+//移动开发
+router.get('/getMobileCourse',function(req,res){
+    courseModel.getSorting([req.query.sorting],function(data){
+        if(data){
+            res.json(result.createResult('success',data))
+        }else{
+            res.json(result.createResult('error','出现错误'))
+        }
+    })
+})
+//全栈开发
+router.get('/getFullStackCourse',function(req,res){
+    courseModel.getSorting([req.query.sorting],function(data){
+        if(data){
+            res.json(result.createResult('success',data))
+        }else{
+            res.json(result.createResult('error','出现错误'))
+        }
+    })
+})
+
+module.exports=router

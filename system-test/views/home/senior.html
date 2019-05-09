@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="/home/css/base.css"/>
+	<link rel="stylesheet" type="text/css" href="/home/css/public.css"/>
+	<link rel="stylesheet" type="text/css" href="/home/css/index.css"/>
+	<link rel="stylesheet" type="text/css" href="/home/css/foundation.css"/>
+	<link rel="stylesheet" type="text/css" href="/home/css/isLogin.css"/>
+	<style type="text/css">
+		.group-list{
+			height: 651px;
+			background: url(/home/img/bag/bg10.png) no-repeat ;
+			background-size: auto;
+		}
+	</style>
+</head>
+<body>
+<%- include('public-header.html')%>
+<div id="content" class="content">
+	<div class="wrap">
+		<div class="group-list clearfix">
+			<h2 id="h2">
+				<!-- 高级修炼  &nbsp; 共188集 -->
+			</h2>
+			<div id="row" class="row">
+				
+			</div>
+		</div>
+	</div>
+</div>
+<%- include('public-footer.html')%>
+<script>
+		$(function(){
+			//页面加载时,前端向后台发送数据,获得所有的基础课程,并计算总课时,将每门课程显示在页面上.
+			$.get('/admin/course/getSeniorCourse',{sorting:'高级修炼'},function(result){
+				if(result.success==='error'){
+					alert(result.data);
+				}else{
+					// console.log(result.data);//是一个数组
+					var seniorArr=result.data;
+					var sumSenior=0;
+					for(var i=0;i<seniorArr.length;i++){
+						sumSenior+=seniorArr[i].courseTime;
+						//将每一门课显示到页面中.
+						var $newBox=$('<div class="group-list-item"></div>');
+						$newBox.html('<p>'+seniorArr[i].courseName+'</p><p><span class="iconfont">&#xe6cc;</span>&nbsp;&nbsp;共'+seniorArr[i].courseTime+'集</p>');
+						$('#row').append($newBox);
+					}
+					console.log(sumSenior);
+					//将总课时显示到页面中.
+					$('#h2').html('高级修炼  &nbsp; 共'+sumSenior+'集');
+				}
+			})
+		})
+	</script>
+</body>
+</html>

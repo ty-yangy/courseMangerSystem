@@ -1,0 +1,192 @@
+﻿<%- include('public-header.html')%>
+
+		<div class="main-container" id="main-container">
+			<script type="text/javascript">
+				try{ace.settings.check('main-container' , 'fixed')}catch(e){}
+			</script>
+
+			<div class="main-container-inner">
+				<a class="menu-toggler" id="menu-toggler" href="#">
+					<span class="menu-text"></span>
+				</a>
+
+				<%- include('public-sidebar.html')%>
+
+				<div class="main-content">
+					<div class="breadcrumbs" id="breadcrumbs">
+						<script type="text/javascript">
+							try{ace.settings.check('breadcrumbs' , 'fixed')}catch(e){}
+						</script>
+
+						<ul class="breadcrumb">
+							<li>
+								<i class="icon-home home-icon"></i>
+								<a href="#">首页</a>
+							</li>
+							<li class="active">添加链接</li>
+						</ul><!-- .breadcrumb -->
+
+						<div class="nav-search" id="nav-search">
+							<form class="form-search">
+								<span class="input-icon">
+									<input type="text" placeholder="Search ..." class="nav-search-input" id="nav-search-input" autocomplete="off" />
+									<i class="icon-search nav-search-icon"></i>
+								</span>
+							</form>
+						</div><!-- #nav-search -->
+					</div>
+
+					<div class="page-content">
+
+						<div class="page-header">
+							<h1>
+								添加链接								
+							</h1>
+						</div><!-- /.page-header -->
+
+					<form class="form-horizontal" role="form">
+							<div class="form-group">
+								<label class="col-sm-2 control-label no-padding-right" for="linkName">链接名称:</label>
+
+								<div class="col-sm-10">
+									<input type="text" id="linkName" placeholder="" class="col-xs-10 col-sm-5">
+									<span class="message-name"></span>
+								</div>
+							</div>
+
+
+							<div class="form-group">
+								<label class="col-sm-2 control-label no-padding-right" for="linkAddress">链接地址:</label>
+
+								<div class="col-sm-10">
+									<input type="text" id="linkAddress" placeholder="" class="col-xs-10 col-sm-5">
+									<span class="message-address"></span>
+								</div>
+							</div>
+							
+						 
+							
+							<div class="form-group">
+								<label class="col-sm-2 control-label no-padding-right" for="linkOrder">链接排序:</label>
+
+								<div class="col-sm-10">
+									<input type="text" id="linkOrder" placeholder="" class="col-xs-10 col-sm-5">
+									<span class="message-order"></span>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label no-padding-right" for="linkDescription">链接描述:</label>
+
+								<div class="col-sm-10">
+									<textarea type="text" id="linkDescription" placeholder="" class="col-xs-10 col-sm-5"></textarea>
+									<span class="message-description"></span>
+								</div>
+							</div>
+
+							<div class="form-group">
+							 
+								<div class="col-sm-6 center">
+									<button class="saveBtn btn btn-primary"type="button">保存</button>
+									<button class="cancelBtn btn btn-danger"type="button">取消</button>
+								</div>
+							</div>
+					</form>
+					 
+					</div>
+				</div><!-- /.main-content -->
+			
+			</div><!-- /.main-container-inner -->
+
+			<a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
+				<i class="icon-double-angle-up icon-only bigger-110"></i>
+			</a>
+		</div><!-- /.main-container -->
+
+
+		<%- include('public-footer.html')%>
+		<script>
+			$(function(){
+				$('#linkName').blur(function(){
+					if(!$(this).val){
+						$('.message-name').html('链接名称不能为空').css('color','red');
+						$('.btn-primary').attr('disabled',true);
+					}else{
+						//验证链接名称是否存在
+						$.post('/admin/link/checkLinkName',{name:$('#linkName').val()},function(result){
+							if(result.success==='error'){
+								$('.message-name').html(result.data).css('color','red');
+								$('.btn-primary').attr('disabled',true);
+							}else{
+								$('.message-name').html('').css('color','green');
+								$('.btn-primary').attr('disabled',false);
+							}
+						})
+					}
+				})
+				//验证链接地址
+				$('#linkAddress').blur(function(){
+					if(!$(this).val){
+						$('.message-address').html('链接名称不能为空').css('color','red');
+						$('.btn-primary').attr('disabled',true);
+					}else{
+						//验证链接名称是否存在
+						$.post('/admin/link/checkLinkAddress',{address:$('#linkAddress').val()},function(result){
+							if(result.success==='error'){
+								$('.message-address').html(result.data).css('color','red');
+								$('.btn-primary').attr('disabled',true);
+							}else{
+								$('.message-address').html('').css('color','green');
+								$('.btn-primary').attr('disabled',false);
+							}
+						})
+					}
+				})
+				//验证序号,描述不能为空
+				$('#linkOrder').blur(function(){
+					if(!$(this).val()){
+						$('.message-order').html('链接序号不能为空').css('color','red');
+						$('.btn-primary').attr('disabled',true);
+					}else{
+						$('.message-order').html('').css('color','green');
+						$('.btn-primary').attr('disabled',false);
+					}
+				})
+				$('#linkDescription').blur(function(){
+					if(!$(this).val()){
+						$('.message-description').html('链接描述内容不能为空').css('color','red');
+						$('.btn-primary').attr('disabled',true);
+					}else{
+						$('.message-description').html('').css('color','green');
+						$('.btn-primary').attr('disabled',false);
+					}
+				})
+				//点击确定按钮,保存
+				$('.saveBtn').click(function(){
+						//获取到表单中输入的数据,并发送到后台
+						$.post('/admin/link/addLinkInfo',{
+							name:$.trim($('#linkName').val()),
+							address:$.trim($('#linkAddress').val()),
+							order:$.trim($('#linkOrder').val()),
+							description:$.trim($('#linkDescription').val())
+						},function(result){
+							if(result.success==='error'){
+								alert(result.data);
+								window.location.reload();
+							}else{
+								alert(result.data);
+								window.location.href='/admin/link/list';
+							}
+						})
+					
+					return false;
+				});	
+				$('.cancelBtn').click(function(){
+					window.location.reload();
+					return flase;
+				})
+			})
+		</script>
+
+</body>
+</html>
+

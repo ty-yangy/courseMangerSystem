@@ -1,0 +1,211 @@
+﻿<%- include('public-header.html')%>
+
+		<div class="main-container" id="main-container">
+			<script type="text/javascript">
+				try{ace.settings.check('main-container' , 'fixed')}catch(e){}
+			</script>
+
+			<div class="main-container-inner">
+				<a class="menu-toggler" id="menu-toggler" href="#">
+					<span class="menu-text"></span>
+				</a>
+
+				<%- include('public-sidebar.html')%>
+				<div class="main-content">
+					<div class="breadcrumbs" id="breadcrumbs">
+						<script type="text/javascript">
+							try{ace.settings.check('breadcrumbs' , 'fixed')}catch(e){}
+						</script>
+
+						<ul class="breadcrumb">
+							<li>
+								<i class="icon-home home-icon"></i>
+								<a href="/admin/admins">首页</a>
+							</li>
+							<li class="active">添加分类</li>
+						</ul><!-- .breadcrumb -->
+
+						<div class="nav-search" id="nav-search">
+							<form class="form-search">
+								<span class="input-icon">
+									<input type="text" placeholder="Search ..." class="nav-search-input" id="nav-search-input" autocomplete="off" />
+									<i class="icon-search nav-search-icon"></i>
+								</span>
+							</form>
+						</div><!-- #nav-search -->
+					</div>
+
+					<div class="page-content">
+
+						<div class="page-header">
+							<h1>
+								添加分类								
+							</h1>
+						</div><!-- /.page-header -->
+
+					<form class="form-horizontal" role="form">
+							<div class="form-group">
+								<label class="col-sm-2 control-label no-padding-right" for="categoryName">分类名称:</label>
+
+								<div class="col-sm-10">
+									<input type="text" id="categoryName" placeholder="" class="col-xs-10 col-sm-5">
+									<span class="message-name"></span>
+								</div>
+							</div>
+
+
+							<div class="form-group">
+								<label class="col-sm-2 control-label no-padding-right" for="categoryOrder">分类排序号:</label>
+
+								<div class="col-sm-10">
+									<input type="text" id="categoryOrder" placeholder="" class="col-xs-10 col-sm-5">
+									<span class="message-order"></span>
+								</div>
+							</div>
+						
+							
+							<div class="form-group">
+								<label class="col-sm-2 control-label no-padding-right" for="categoryDescription">分类描述:</label>
+
+								<div class="col-sm-10">
+									<textarea type="textarea" id="categoryDescription" placeholder="" class="col-xs-10 col-sm-5"></textarea>
+									<span class="message-description"></span>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label no-padding-right" for="categoryIcon">分类图标:</label>
+
+								<div class="col-sm-10">
+									<input type="text" id="categoryIcon" placeholder="" class="col-xs-10 col-sm-5">
+									<span class="message-icon"></span>
+								</div>
+							</div>
+						 
+							
+							<div class="form-group">
+								<label class="col-sm-2 control-label no-padding-right" for="form-field-1">分类状态:</label>
+
+								<div class="col-sm-10">
+									<label class="checkbox-inline">
+										<input type="radio" id="show" value="显示" name="categoryStatus"> 显示
+									</label>
+									<label class="checkbox-inline">
+										<input type="radio" id="hide" value="隐藏" name="categoryStatus"> 隐藏
+									</label>
+								</div>
+							</div>
+
+						 
+							<div class="form-group">
+							 
+								<div class="col-sm-6 center">
+									<button class="saveBtn btn btn-primary" type="button">保存</button>
+									<button class="cancelBtn btn btn-danger" type="button">取消</button>
+								</div>
+							</div>
+					</form>
+					 
+					</div>
+				</div><!-- /.main-content -->
+			
+			</div><!-- /.main-container-inner -->
+
+			<a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
+				<i class="icon-double-angle-up icon-only bigger-110"></i>
+			</a>
+		</div><!-- /.main-container -->
+
+
+		<%- include('public-footer.html')%>
+		<script>
+			$(function(){
+				$('#categoryName').blur(function(){
+					if(!$(this).val()){
+						$('.message-name').html('分类名称不能为空').css('color','red');
+						$('.btn-primary').attr('disabled',true);
+					}else{
+						$.get('/admin/category/addCategoryName',{name:$('#categoryName').val()},function(result){
+							if(result.success==='error'){
+								$('.message-name').html(result.data).css('color','red');
+								$('.btn-primary').attr('disabled',true);
+							}else{
+								$('.message-name').html('');
+								$('.btn-primary').attr('disabled',false);
+							}
+						},'json');
+					}
+				})
+				$('#categoryOrder').blur(function(){
+					if(!$(this).val()){
+						$('.message-order').html('分类顺序不能为空').css('color','red');
+						$('.btn-primary').attr('disabled',true);
+					}else{
+						$.get('/admin/category/addCategoryOrder',{order:$('#categoryOrder').val()},function(result){
+							if(result.success==='error'){
+								$('.message-order').html(result.data).css('color','red');
+								$('.btn-primary').attr('disabled',true);
+							}else{
+								$('.message-order').html('');
+								$('.btn-primary').attr('disabled',false);
+							}
+						},'json');
+					}
+				})
+				$('#categoryDescription').blur(function(){
+					if(!$(this).val()){
+						$('.message-description').html('分类描述不能为空').css('color','red');
+						$('.btn-primary').attr('disabled',true);
+					}else{
+						$('.message-description').html(' ').css('color','green');
+						$('.btn-primary').attr('disabled',false);
+					}
+				})
+				$('#categoryIcon').blur(function(){
+					if(!$(this).val()){
+						$('.message-icon').html('分类名称不能为空').css('color','red');
+						$('.btn-primary').attr('disabled',true);
+					}else{
+						$('.message-icon').html(' ').css('color','green');
+						$('.btn-primary').attr('disabled',false);
+					}
+				})
+				
+				//点击提交按钮,保存数据
+				$('.saveBtn').click(function(){
+					var statusVal=$('input[name="categoryStatus"]:checked').val();
+					if(statusVal==null){
+						alert('请选择分类状态');
+						return;
+					}else{
+						$.post('/admin/category/addCategoryInfo',{
+						name:$.trim($('#categoryName').val()),
+						order:$.trim($('#categoryOrder').val()),
+						icon:$.trim($('#categoryIcon').val()),
+						description:$.trim($('#categoryDescription').val()),
+						status:$('input[name="categoryStatus"]:checked').val(),
+					},function(result){
+						if(result.success==='error'){
+								alert(result.data);
+								window.location.reload();
+							}else{
+								alert(result.data);
+								window.location.href='/admin/category/list';
+							}
+						})
+					}
+					return false;
+					
+				})
+				$('.cancelBtn').click(function(){
+					window.location.reload();
+					return flase;
+				})
+			})
+		</script>
+	
+
+	
+	
+</body>
+</html>
+

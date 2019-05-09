@@ -1,0 +1,167 @@
+﻿<%- include('public-header.html')%>
+
+		<div class="main-container" id="main-container">
+			<script type="text/javascript">
+				try{ace.settings.check('main-container' , 'fixed')}catch(e){}
+			</script>
+
+			<div class="main-container-inner">
+				<a class="menu-toggler" id="menu-toggler" href="#">
+					<span class="menu-text"></span>
+				</a>
+
+				<%- include('public-sidebar.html')%>
+
+				<div class="main-content">
+					<div class="breadcrumbs" id="breadcrumbs">
+						<script type="text/javascript">
+							try{ace.settings.check('breadcrumbs' , 'fixed')}catch(e){}
+						</script>
+
+						<ul class="breadcrumb">
+							<li>
+								<i class="icon-home home-icon"></i>
+								<a href="/admin/admins">首页</a>
+							</li>
+							<li class="active">课程分类列表</li>
+						</ul><!-- .breadcrumb -->
+
+						<div class="nav-search" id="nav-search">
+							<form class="form-search">
+								<span class="input-icon">
+									<input type="text" placeholder="Search ..." class="nav-search-input" id="nav-search-input" autocomplete="off" />
+									<i class="icon-search nav-search-icon"></i>
+								</span>
+							</form>
+						</div><!-- #nav-search -->
+					</div>
+
+					<div class="page-content">
+
+						<div class="page-header">
+							<h1>
+								课程分类列表								
+							</h1>
+						</div><!-- /.page-header -->
+
+
+
+						<!--表格-->
+
+						<div class="table-responsive">
+							<table id="sample-table-1" class="table table-striped table-bordered table-hover center">
+								<thead>
+									<tr>
+									 
+										<th class="center">编号</th>
+										<th class="center">分类名称</th>
+										<th class="hidden-480 center">分类排序</th>
+										<th class="hidden-480 center">分类状态</th>
+										<th class="hidden-480 center">分类图标</th>
+										<th class="center">
+											<i class="icon-time bigger-110 hidden-480"></i>
+											分类描述
+										</th>
+										 
+
+										<th width="80px;" class="center">操作</th>
+									</tr>
+								</thead>
+
+								<tbody>
+									
+								</tbody>
+							</table>
+						</div>
+
+					</div>
+				</div><!-- /.main-content -->
+			
+			</div><!-- /.main-container-inner -->
+
+			<a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
+				<i class="icon-double-angle-up icon-only bigger-110"></i>
+			</a>
+		</div><!-- /.main-container -->
+
+
+		<%- include('public-footer-list.html')%>
+		<script>
+			$(function(){
+				//当页面加载时立刻发送请求到后台,并更新数据显示当前页.
+				$.get('/admin/category/categoryList',function(result){
+					if(result.success==='error'){
+							alert(result.data);
+						}else{
+							var getInfoArr=result.data;
+							var index=0;
+							for(var i=0;i<getInfoArr.length;i++){
+								index++;
+								var oTr=document.createElement('tr');
+								var categoryObj=getInfoArr[i];
+								for(var item in categoryObj){
+									if(item === 'id'){
+										categoryObj[item]=index;
+									}
+									var oTd=document.createElement('td');
+									$(oTd).html(categoryObj[item]);
+									oTr.appendChild(oTd);
+								}
+								$('tbody').get(0).appendChild(oTr);
+								//手动添加是删除和编辑单元格
+								var oM=document.createElement('td');
+								oM.innerHTML='<div class="visible-md visible-lg hidden-sm hidden-xs btn-group center"><a id="editBtn" class="btn btn-xs btn-info"><i id="edit-btn" class="icon-edit bigger-120"></i></a>&nbsp;<button id="deleteBtn" class="btn btn-xs btn-danger"><i id="delete-btn" class="icon-trash bigger-120"></i></button></div>'
+								oTr.appendChild(oM);
+							}
+						}
+				})
+				$('tbody').click(function(ev){
+					var ev=ev || window.event;
+					var aTd=$('tbody li')
+					if(ev.target.id==='deleteBtn' || ev.target.id==='delete-btn'){
+						//点击删除按钮,发送相应的id到后台---->后台接收到id后连接数据库--->删除数据库中id所在行的信息
+						//--->后台将删除结果返回前端--->前端再刷新当前list页面.
+						if(ev.target.id==='deleteBtn'){
+							nameValue=ev.target.parentNode.parentNode.parentNode.children[1].innerHTML;
+						}else if(ev.target.id==='delete-btn'){
+							nameValue=ev.target.parentNode.parentNode.parentNode.parentNode.children[1].innerHTML;
+						}
+						$.get('/admin/category/deletecategory',{
+							'name':nameValue
+						},function(result){
+							if(result.success==='error'){
+								alert(result.data);
+							}else{
+								alert(result.data);
+								location.reload();
+							}
+						})
+					}
+					if(ev.target.id==='editBtn'||ev.target.id==='edit-btn'){
+						if(ev.target.id==='editBtn'){
+							nameValue=ev.target.parentNode.parentNode.parentNode.children[1].innerHTML;
+						}else if(ev.target.id==='edit-btn'){
+							nameValue=ev.target.parentNode.parentNode.parentNode.parentNode.children[1].innerHTML;
+						}
+						console.log(nameValue);
+						//前端向后端发送数据--->后台接收数据--->将emailValue所在行的数据显示到user_edit页面并返回给前端--->前端修改数据并保存到enailValue所在行
+						//--->发送给后台--->后台保存数据到数据库--->将保存结果显示给前端--->根据不同结果处理相应的页面
+						$.post('/admin/category/editInfo',{
+								name:nameValue
+							},function(result){	
+								if(result.success==='error'){
+									alert(result.message);
+								}else{
+									window.location.href='/admin/category/edit?'+'value='+encodeURI(result.data);
+								}	
+							}
+						)
+					}
+				})
+				
+			})
+		</script>
+	
+</body>
+</html>
+

@@ -1,0 +1,217 @@
+﻿<%- include('public-header.html')%>
+		<div class="main-container" id="main-container">
+			<script type="text/javascript">
+				try{ace.settings.check('main-container' , 'fixed')}catch(e){}
+			</script>
+
+			<div class="main-container-inner">
+				<a class="menu-toggler" id="menu-toggler" href="#">
+					<span class="menu-text"></span>
+				</a>
+
+				<%- include('public-sidebar.html')%>
+
+				<div class="main-content">
+					<div class="breadcrumbs" id="breadcrumbs">
+						<script type="text/javascript">
+							try{ace.settings.check('breadcrumbs' , 'fixed')}catch(e){}
+						</script>
+
+						<ul class="breadcrumb">
+							<li>
+								<i class="icon-home home-icon"></i>
+								<a href="#">首页</a>
+							</li>
+							<li class="active">添加课程</li>
+						</ul><!-- .breadcrumb -->
+
+						<div class="nav-search" id="nav-search">
+							<form class="form-search">
+								<span class="input-icon">
+									<input type="text" placeholder="Search ..." class="nav-search-input" id="nav-search-input" autocomplete="off" />
+									<i class="icon-search nav-search-icon"></i>
+								</span>
+							</form>
+						</div><!-- #nav-search -->
+					</div>
+
+					<div class="page-content">
+
+						<div class="page-header">
+							<h1>
+								添加课程								
+							</h1>
+						</div><!-- /.page-header -->
+
+					<form class="form-horizontal" role="form">
+							<div class="form-group">
+								<label class="col-sm-2 control-label no-padding-right" for="courseName">课程名称:</label>
+
+								<div class="col-sm-10">
+									<input type="text" id="courseName" placeholder="" class="col-xs-10 col-sm-5">
+									<span class="message-name"></span>
+								</div>
+							</div>
+
+
+							<div class="form-group">
+								<label class="col-sm-2 control-label no-padding-right" for="courseAddress">课程地址:</label>
+
+								<div class="col-sm-10">
+									<input type="text" id="courseAddress" placeholder="" class="col-xs-10 col-sm-5">
+									<span class="message-address"></span>
+									<!-- <span class="help-inline col-xs-12 col-sm-7">
+										<span class="middle">如果填写则跳转到外部地址（选填）</span>
+									</span> -->
+								</div>
+							</div>
+							
+							<div class="form-group">
+								<label class="col-sm-2 control-label no-padding-right" for="courseCategory">所属分类:</label>
+
+								<div class="col-sm-10">
+									<select name="sorting" id="courseCategory" style="width:200px;">
+										<option value="未分类">--请选择分类--</option>
+										<!-- <option value="12">零基础入门</option>
+										<option value="11">进阶实战</option>
+										<option value="10">高级修炼</option>
+										<option value="10">战力强化</option>
+										<option value="10">移动开发</option>
+										<option value="10">python全栈</option> -->
+									</select>
+									
+								</div>
+							</div>
+							
+							<div class="form-group">
+								<label class="col-sm-2 control-label no-padding-right" for="courseTime">课时数:</label>
+
+								<div class="col-sm-10">
+									<input type="text" id="courseTime" placeholder="" class="col-xs-10 col-sm-5">
+									<span class="message-time"></span>
+								</div>
+							</div>
+							
+							<div class="form-group">
+								<label class="col-sm-2 control-label no-padding-right" for="courseStatus">是否完结:</label>
+
+								<div class="col-sm-10">
+									<label class="checkbox-inline">
+										<input type="radio" id="ending" value="完结" name="status"> 完结
+									</label>
+									<label class="checkbox-inline">
+										<input type="radio" id="updating" value="更新中" name="status"> 更新中
+									</label>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-6 center">
+									<button class="saveBtn btn btn-primary" type="button">保存</button>
+									<button class="cancelBtn btn btn-danger" type="button">取消</button>
+								</div>
+							</div>
+						</form>
+
+					</div>
+				</div><!-- /.main-content -->
+			
+			</div><!-- /.main-container-inner -->
+
+			<a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
+				<i class="icon-double-angle-up icon-only bigger-110"></i>
+			</a>
+		</div><!-- /.main-container -->
+
+
+		<%- include('public-footer.html')%>
+		<script>
+			$(function(){
+				//将classify表中的分类名称显示到select的每一个option中
+				$.get('/admin/course/getAllCategoryNameFromClassify',function(result){
+					if(result.success==='error'){
+						alert(result.message)
+					}else{
+						var nameArr=result.data;
+						for(var i=0;i<nameArr.length;i++){
+							//将这些值赋给每一个option
+							$('#courseCategory').append('<option value="'+nameArr[i].categoryName+'">'+nameArr[i].categoryName+'</option>');
+						}
+					}
+				})
+				//验证每一项输入不能为空
+				$('#courseName').blur(function(){
+					if(!$(this).val()){
+						$('.message-name').html('课程名称不能为空').css('color','red');
+						$('.btn-primary').attr('disabled',true);
+					}else{
+						// $('.message-name').html('').css('color','green');
+						// $('.btn-primary').attr('disabled',false);
+						//验证名称不能重复
+						$.get('/admin/course/checkCourseName',{name:$('#courseName').val()},function(result){
+							if(result.success==='error'){
+								$('.message-name').html(result.data).css('color','red');
+								$('.btn-primary').attr('disabled',true);
+							}else{
+								$('.message-name').html('').css('color','green');
+								$('.btn-primary').attr('disabled',false);
+							}
+						})
+					}
+				})
+				$('#courseAddress').blur(function(){
+					if(!$(this).val()){
+						$('.message-address').html('课程名称不能为空').css('color','red');
+						$('.btn-primary').attr('disabled',true);
+					}else{
+						$('.message-address').html('').css('color','green');
+						$('.btn-primary').attr('disabled',false);
+					}
+				})
+				$('#courseTime').blur(function(){
+					if(!$(this).val()){
+						$('.message-time').html('课程名称不能为空').css('color','red');
+						$('.btn-primary').attr('disabled',true);
+					}else{
+						$('.message-time').html('').css('color','green');
+						$('.btn-primary').attr('disabled',false);
+					}
+				})
+				$('.saveBtn').click(function(){
+					var category=$('#courseCategory').find('option:selected').val();			
+					var status=$('input[name="status"]:checked').val();
+					var postObj={
+						name:$('#courseName').val(),
+						address:$('#courseAddress').val(),
+						category:$('#courseCategory').find('option:selected').val(),
+						time:$('#courseTime').val(),
+						status:$('input[name="status"]:checked').val()
+					}
+					// console.log(category,status);
+					if(!category || !status){
+						alert('请选择课程分类或课程状态');
+					}else{
+						//发送数据到后台,并保存到数据库
+						$.post('/admin/course/saveCourseInfo',postObj,function(result){
+							if(result.success==='error'){
+								alert(result.data);
+							}else{
+								alert(result.data);
+								window.location.href='/admin/course/list';
+							}
+						})
+					}
+					return false;
+				})
+				$('.cancelBtn').click(function(){
+					window.location.reload();
+					return false;
+				})
+
+			})
+		</script>
+
+
+		
+</body>
+</html>
+

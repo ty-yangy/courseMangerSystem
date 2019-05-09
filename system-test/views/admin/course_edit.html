@@ -1,0 +1,188 @@
+﻿<%- include('public-header.html')%>
+
+		<div class="main-container" id="main-container">
+			<script type="text/javascript">
+				try{ace.settings.check('main-container' , 'fixed')}catch(e){}
+			</script>
+
+			<div class="main-container-inner">
+				<a class="menu-toggler" id="menu-toggler" href="#">
+					<span class="menu-text"></span>
+				</a>
+
+				<%- include('public-sidebar.html')%>
+
+				<div class="main-content">
+					<div class="breadcrumbs" id="breadcrumbs">
+						<script type="text/javascript">
+							try{ace.settings.check('breadcrumbs' , 'fixed')}catch(e){}
+						</script>
+
+						<ul class="breadcrumb">
+							<li>
+								<i class="icon-home home-icon"></i>
+								<a href="#">首页</a>
+							</li>
+							<li class="active">编辑课程</li>
+						</ul><!-- .breadcrumb -->
+
+						<div class="nav-search" id="nav-search">
+							<form class="form-search">
+								<span class="input-icon">
+									<input type="text" placeholder="Search ..." class="nav-search-input" id="nav-search-input" autocomplete="off" />
+									<i class="icon-search nav-search-icon"></i>
+								</span>
+							</form>
+						</div><!-- #nav-search -->
+					</div>
+
+					<div class="page-content">
+
+						<div class="page-header">
+							<h1>
+								编辑课程								
+							</h1>
+						</div><!-- /.page-header -->
+
+					<form class="form-horizontal" role="form">
+							<div class="form-group">
+								<label class="col-sm-2 control-label no-padding-right" for="courseName">课程名称:</label>
+
+								<div class="col-sm-10">
+									<input type="text" id="courseName" placeholder="" class="col-xs-10 col-sm-5">
+								</div>
+							</div>
+
+
+							<div class="form-group">
+								<label class="col-sm-2 control-label no-padding-right" for="courseAddress">课程地址:</label>
+
+								<div class="col-sm-10">
+									<input type="text" id="courseAddress" placeholder="" class="col-xs-10 col-sm-5">
+									<!-- <span class="help-inline col-xs-12 col-sm-7">
+										<span class="middle">如果填写则跳转到外部地址（选填）</span>
+									</span> -->
+								</div>
+							</div>
+							
+							<div class="form-group">
+								<label class="col-sm-2 control-label no-padding-right" for="courseCategory">所属分类:</label>
+
+								<div class="col-sm-10">
+									<select name="sorting" id="courseCategory" style="width:200px;" autocomplete="off">
+										<option value="未分类">--请选择分类--</option>
+									</select>
+									
+								</div>
+							</div>
+							
+							<div class="form-group">
+								<label class="col-sm-2 control-label no-padding-right" for="courseTime">课时数:</label>
+
+								<div class="col-sm-10">
+									<input type="text" id="courseTime" placeholder="" class="col-xs-10 col-sm-5">
+								</div>
+							</div>
+							
+							<div class="form-group">
+								<label class="col-sm-2 control-label no-padding-right" for="status">是否完结:</label>
+
+								<div class="col-sm-10">
+									<label class="checkbox-inline">
+										<input type="radio" id="ending" value="完结" name="status"> 完结
+									</label>
+									<label class="checkbox-inline">
+										<input type="radio" id="updating" value="更新中" name="status"> 更新中
+									</label>
+								</div>
+							</div>
+							<div class="form-group">
+							 
+								<div class="col-sm-6 center">
+									<button class="saveBtn btn btn-primary" type="button">保存</button>
+									<button class="cancelBtn btn btn-danger" type="button">取消</button>
+								</div>
+							</div>
+						</form>
+
+					</div>
+				</div><!-- /.main-content -->
+			
+			</div><!-- /.main-container-inner -->
+
+			<a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
+				<i class="icon-double-angle-up icon-only bigger-110"></i>
+			</a>
+		</div><!-- /.main-container -->
+
+
+		<%- include('public-footer.html')%>
+
+		<script>
+			$(function(){
+				//页面加载时,发送请求,显示list页面传过来的id所在的信息
+				//所属分类:选项来源于category数据表中的categoryName,并将这些数据显示在选项中.
+				//1.显示id所在行的信息
+				var loc=location.href;
+				var n1=loc.length;
+				var n2=loc.indexOf('=');
+				var id=decodeURI(loc.substr(n2+1,n1-n2));
+				$.get('/admin/course/getAllCategoryNameFromClassify',function(result){
+					if(result.success==='error'){
+						alert(result.message)
+					}else{
+						var nameArr=result.data;
+						for(var i=0;i<nameArr.length;i++){
+							//将这些值赋给每一个option
+							$('#courseCategory').append('<option value="'+nameArr[i].categoryName+'">'+nameArr[i].categoryName+'</option>');
+						}
+					}
+				})
+				$.post('/admin/course/getInfoCourseInitPage',{id:id},function(result){
+					if(result.success==='error'){
+						alert(result.message)
+					}else{
+						$('#courseName').val(result.data.courseName);
+						$('#courseAddress').val(result.data.courseAddress);
+						//将课程对应的分类选中
+						$('#courseCategory').find('option[value="'+result.data.courseCategory+'"]').prop("selected","selected");
+						$('#courseTime').val(result.data.courseTime);
+						$('#courseStatus').val(result.data.courseStatus);
+						$('input[value="'+result.data.courseStatus+'"]').attr('checked','true');
+					}				
+				})
+				//点击确定保存数据并发送至后台--->后台将数据保存到数据库--->将结果返回给前端
+				$('.saveBtn').click(function(){
+					var name=$.trim($('#courseName').val());
+					var address=$.trim($('#courseAddress').val());
+					var category=$('#courseCategory').find('option:selected').val();
+					var time=$.trim($('#courseTime').val());
+					var status=$('input[name="status"]:checked').val();
+					$.post('/admin/course/editCourseSave',{
+						name:name,
+						address:address,
+						category:category,
+						time:time,
+						status:status,
+						id:id
+					},function(result){
+						if(result.success==='success'){
+							alert(result.data);
+							window.location.href='/admin/course/list';
+						}else{
+							alert(result.data);
+						}
+						console.log(result.data);
+					})
+					return false;
+				})
+				$('.cancelBtn').click(function(){
+					location.reload();
+					return false;
+				});
+			})	
+		</script>
+
+</body>
+</html>
+

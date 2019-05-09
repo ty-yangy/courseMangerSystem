@@ -1,0 +1,174 @@
+﻿<%- include('public-header.html')%>
+
+		<div class="main-container" id="main-container">
+			<script type="text/javascript">
+				try{ace.settings.check('main-container' , 'fixed')}catch(e){}
+			</script>
+
+			<div class="main-container-inner">
+				<a class="menu-toggler" id="menu-toggler" href="#">
+					<span class="menu-text"></span>
+				</a>
+
+				<%- include('public-sidebar.html')%>
+
+				<div class="main-content">
+					<div class="breadcrumbs" id="breadcrumbs">
+						<script type="text/javascript">
+							try{ace.settings.check('breadcrumbs' , 'fixed')}catch(e){}
+						</script>
+
+						<ul class="breadcrumb">
+							<li>
+								<i class="icon-home home-icon"></i>
+								<a href="/admin/admins/">首页</a>
+							</li>
+							<li class="active">添加导航</li>
+						</ul><!-- .breadcrumb -->
+
+						<div class="nav-search" id="nav-search">
+							<form class="form-search">
+								<span class="input-icon">
+									<input type="text" placeholder="Search ..." class="nav-search-input" id="nav-search-input" autocomplete="off" />
+									<i class="icon-search nav-search-icon"></i>
+								</span>
+							</form>
+						</div><!-- #nav-search -->
+					</div>
+
+					<div class="page-content">
+
+						<div class="page-header">
+							<h1>
+								添加导航								
+							</h1>
+						</div><!-- /.page-header -->
+
+					<form class="form-horizontal" role="form">
+							<div class="form-group">
+								<label class="col-sm-2 control-label no-padding-right" for="name">导航名称:</label>
+
+								<div class="col-sm-10">
+									<input type="text" id="name" placeholder="" class="col-xs-10 col-sm-5">
+									<span class="message-name"></span>
+								</div>
+							</div>
+
+
+							<div class="form-group">
+								<label class="col-sm-2 control-label no-padding-right" for="address">导航地址:</label>
+
+								<div class="col-sm-10">
+									<input type="text" id="address" placeholder="" class="col-xs-10 col-sm-5">
+									<span class="message-address"></span>
+								</div>
+							</div>
+					 
+							
+							<div class="form-group">
+								<label class="col-sm-2 control-label no-padding-right" for="status">导航状态:</label>
+
+								<div class="col-sm-10">
+									<label class="checkbox-inline">
+										<input type="radio" id="show" value="显示" name="status"> 显示
+									</label>
+									<label class="checkbox-inline">
+										<input type="radio" id="hide" value="隐藏" name="status"> 隐藏
+									</label>
+								</div>
+							</div>
+
+						 
+							<div class="form-group">
+							 
+								<div class="col-sm-6 center">
+									<button class="saveBtn btn btn-primary" type="button">保存</button>
+									<button class="cancelBtn btn btn-danger" type="button">取消</button>
+								</div>
+							</div>
+					</form>
+					 
+					</div>
+				</div><!-- /.main-content -->
+			
+			</div><!-- /.main-container-inner -->
+
+			<a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
+				<i class="icon-double-angle-up icon-only bigger-110"></i>
+			</a>
+		</div><!-- /.main-container -->
+
+
+		<%- include('public-footer.html')%>
+
+		<script>
+			$(function(){
+				//验证导航名称是否存在
+				$('#name').blur(function(){
+					if(!$(this).val()){
+						$('.message-name').html('导航名称不能为空').css('color','red');
+						$('.btn-primary').attr('disabled',true);
+					}else{
+						$.get('/admin/nav/addNavName',{name:$('#name').val()},function(result){
+							if(result.success==='error'){
+								$('.message-name').html(result.data).css('color','red');
+								$('.btn-primary').attr('disabled',true);
+							}else{
+								$('.message-name').html('');
+								$('.btn-primary').attr('disabled',false);
+							}
+						},'json');
+					}
+				})	
+				//验证导航地址是否存在
+				$('#address').blur(function(){
+					if(!$(this).val()){
+						$('.message-address').html('导航地址不能为空').css('color','red');
+						$('.btn-primary').attr('disabled',true);
+					}else{
+						$.get('/admin/nav/addNavAddress',{address:$('#address').val()},function(result){
+							if(result.success==='error'){
+								$('.message-address').html(result.data).css('color','red');
+								$('.btn-primary').attr('disabled',true);
+							}else{
+								$('.message-address').html('');
+								$('.btn-primary').attr('disabled',false);
+							}
+						},'json');
+					}
+					
+				})
+				$('.saveBtn').click(function(){
+					var statusVal=$('input[name="status"]:checked').val();
+					if(statusVal==null){
+						alert('导航显示状态不能为空');
+						return;
+					}else{
+						//获取到表单中输入的数据,并发送到后台
+						$.post('/admin/nav/addNavInfo',{
+							name:$.trim($('#name').val()),
+							address:$.trim($('#address').val()),
+							status:$('input[name="status"]:checked').val(),
+						},function(result){
+							if(result.success==='error'){
+									alert(result.data);
+									window.location.reload();
+								}else{
+									alert(result.data);
+									window.location.href='/admin/nav/list';
+								}
+						})
+					}
+					
+					return false;
+				});	
+				$('.cancelBtn').click(function(){
+					window.location.reload();
+					return flase;
+				})
+			})
+		</script>
+
+</body>
+</html>
+

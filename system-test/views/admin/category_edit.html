@@ -1,0 +1,170 @@
+﻿<%- include('public-header.html')%>
+
+		<div class="main-container" id="main-container">
+			<script type="text/javascript">
+				try{ace.settings.check('main-container' , 'fixed')}catch(e){}
+			</script>
+
+			<div class="main-container-inner">
+				<a class="menu-toggler" id="menu-toggler" href="#">
+					<span class="menu-text"></span>
+				</a>
+
+				<%- include('public-sidebar.html')%>
+
+				<div class="main-content">
+					<div class="breadcrumbs" id="breadcrumbs">
+						<script type="text/javascript">
+							try{ace.settings.check('breadcrumbs' , 'fixed')}catch(e){}
+						</script>
+
+						<ul class="breadcrumb">
+							<li>
+								<i class="icon-home home-icon"></i>
+								<a href="/admin/admins">首页</a>
+							</li>
+							<li class="active">编辑分类</li>
+						</ul><!-- .breadcrumb -->
+
+						<div class="nav-search" id="nav-search">
+							<form class="form-search">
+								<span class="input-icon">
+									<input type="text" placeholder="Search ..." class="nav-search-input" id="nav-search-input" autocomplete="off" />
+									<i class="icon-search nav-search-icon"></i>
+								</span>
+							</form>
+						</div><!-- #nav-search -->
+					</div>
+
+					<div class="page-content">
+
+						<div class="page-header">
+							<h1>
+								编辑分类								
+							</h1>
+						</div><!-- /.page-header -->
+
+					<form class="form-horizontal" role="form">
+							<div class="form-group">
+								<label class="col-sm-2 control-label no-padding-right" for="categoryName">分类名称:</label>
+
+								<div class="col-sm-10">
+									<input type="text" id="categoryName" placeholder="" class="col-xs-10 col-sm-5">
+								</div>
+							</div>
+
+
+							<div class="form-group">
+								<label class="col-sm-2 control-label no-padding-right" for="categoryOrder">分类排序号:</label>
+
+								<div class="col-sm-10">
+									<input type="text" id="categoryOrder" placeholder="" class="col-xs-10 col-sm-5">
+								</div>
+							</div>
+						
+							
+							<div class="form-group">
+								<label class="col-sm-2 control-label no-padding-right" for="categoryDescription">分类描述:</label>
+
+								<div class="col-sm-10">
+									<textarea type="textarea" id="categoryDescription" placeholder="" class="col-xs-10 col-sm-5"></textarea>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label no-padding-right" for="categoryIcon">分类图标:</label>
+
+								<div class="col-sm-10">
+									<input type="text" id="categoryIcon" placeholder="" class="col-xs-10 col-sm-5">
+								</div>
+							</div>
+
+						 
+							
+							<div class="form-group">
+								<label class="col-sm-2 control-label no-padding-right" for="categoryStatus">分类状态:</label>
+
+								<div class="col-sm-10">
+									<label class="checkbox-inline">
+										<input type="radio" id="show" value="显示" name="categoryStatus"> 显示
+									</label>
+									<label class="checkbox-inline">
+										<input type="radio" id="hide" value="隐藏" name="categoryStatus"> 隐藏
+									</label>
+								</div>
+							</div>
+
+						 
+							<div class="form-group">
+							 
+								<div class="col-sm-6 center">
+									<button class="btn-save btn btn-primary" type="button">保存</button>
+									<button class="btn-cancel btn btn-danger" type="button">取消</button>
+								</div>
+							</div>
+					</form>
+					 
+					</div>
+				</div><!-- /.main-content -->
+			
+			</div><!-- /.main-container-inner -->
+
+			<a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
+				<i class="icon-double-angle-up icon-only bigger-110"></i>
+			</a>
+		</div><!-- /.main-container -->
+
+
+		<%- include('public-footer.html')%>
+
+		<script>
+			$(function(){
+				//接收来自list页面/admin/category/editInfo传来的name,将name所在的那行查询并显示到当前页面
+				var loc = location.href;
+				  var n1 = loc.length;//地址的总长度
+				  var n2 = loc.indexOf("=");//取得=号的位置
+				var id = decodeURI(loc.substr(n2+1, n1-n2));//从=号后面的内容
+				$.post('/admin/category/getInfoCategoryInitPage',{id:id},function(result){
+					if(result.success==='error'){
+						alert(result.message)
+					}else{
+						$('#categoryName').val(result.data.categoryName);
+						$('#categoryOrder').val(result.data.categoryOrder);
+						$('#categoryIcon').val(result.data.categoryIcon);
+						$('#categoryDescription').val(result.data.categoryDescription);
+						$('input[value="'+result.data.categoryStatus+'"]').attr('checked','true');
+					}
+				})
+				//编辑分类信息
+				$('.btn-save').click(function(){
+					var name=$.trim($('#categoryName').val());
+					var order=$.trim($('#categoryOrder').val());
+					var icon=$.trim($('#categoryIcon').val());
+					var description=$.trim($('#categoryDescription').val());
+					var status=$('input[name="categoryStatus"]:checked').val();
+					$.post('/admin/category/editcategorySave',{
+						name:name,
+						order:order,
+						icon:icon,
+						description:description,
+						status:status,
+						id:id
+					},function(result){
+						if(result.success==='success'){
+							alert(result.data);
+							window.location.href='/admin/category/list';
+						}else{
+							alert(result.data);
+						}
+					})
+					return false;
+				})
+				$('.btn-cancel').click(function(){
+					location.reload();
+					return false;
+				});
+			})
+		</script>
+		
+</body>
+</html>
+

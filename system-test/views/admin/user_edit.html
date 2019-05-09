@@ -1,0 +1,184 @@
+﻿<%- include('public-header.html')%>
+
+		<div class="main-container" id="main-container">
+			<script type="text/javascript">
+				try{ace.settings.check('main-container' , 'fixed')}catch(e){}
+			</script>
+
+			<div class="main-container-inner">
+				<a class="menu-toggler" id="menu-toggler" href="#">
+					<span class="menu-text"></span>
+				</a>
+
+				<%- include('public-sidebar.html')%>
+
+				<div class="main-content">
+					<div class="breadcrumbs" id="breadcrumbs">
+						<script type="text/javascript">
+							try{ace.settings.check('breadcrumbs' , 'fixed')}catch(e){}
+						</script>
+
+						<ul class="breadcrumb">
+							<li>
+								<i class="icon-home home-icon"></i>
+								<a href="/admin/admins">首页</a>
+							</li>
+							<li class="active">编辑用户</li>
+						</ul><!-- .breadcrumb -->
+
+						<div class="nav-search" id="nav-search">
+							<form class="form-search">
+								<span class="input-icon">
+									<input type="text" placeholder="Search ..." class="nav-search-input" id="nav-search-input" autocomplete="off" />
+									<i class="icon-search nav-search-icon"></i>
+								</span>
+							</form>
+						</div><!-- #nav-search -->
+					</div>
+
+					<div class="page-content">
+
+						<div class="page-header">
+							<h1>
+								编辑用户								
+							</h1>
+						</div><!-- /.page-header -->
+
+					<form class="form-horizontal" role="form">
+							<div class="form-group">
+								<label class="col-sm-2 control-label no-padding-right" for="usernameFiled">用户名:</label>
+
+								<div class="col-sm-10">
+									<input type="text" id="usernameFiled" placeholder="" class="col-xs-10 col-sm-5">
+								</div>
+							</div>
+
+
+							<div class="form-group">
+								<label class="col-sm-2 control-label no-padding-right" for="emailFiled">邮箱:</label>
+
+								<div class="col-sm-10">
+									<input type="text" id="emailFiled" placeholder="" class="col-xs-10 col-sm-5">
+									 <span class="message-email"></span>
+								</div>
+							</div>
+							
+							<div class="form-group">
+								<label class="col-sm-2 control-label no-padding-right" for="form-field-1">角色:</label>
+
+								<div class="col-sm-10">
+									<label class="checkbox-inline">
+										<input type="radio" id="adminstrator" value="adminstrator" name="role"> 管理员
+									</label>
+									<label class="checkbox-inline">
+										<input type="radio" id="guest" value="guest" name="role"> 普通用户
+									</label>
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="col-sm-2 control-label no-padding-right" for="form-field-1">状态:</label>
+
+								<div class="col-sm-10">
+									<label class="checkbox-inline">
+										<input type="radio" id="activation" value="1" name="status"> 激活
+									</label>
+									<label class="checkbox-inline">
+										<input type="radio" id="forbidden" value="0" name="status"> 禁用
+									</label>
+								</div>
+							</div>
+							<div class="form-group"> 
+								<div class="col-sm-6 center">
+									<button class="btn-save btn btn-primary">保存</button>
+									<button class="btn-cancel btn btn-danger">取消</button>
+								</div>
+							</div>
+					</form>
+					 
+					</div>
+				</div><!-- /.main-content -->
+			
+			</div><!-- /.main-container-inner -->
+
+			<a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
+				<i class="icon-double-angle-up icon-only bigger-110"></i>
+			</a>
+		</div><!-- /.main-container -->
+
+
+		<%- include('public-footer.html')%>
+		<script>
+			$(function(){
+				//编辑用户功能:
+				//收集用户输入及选择的信息---->发送信息到后台--->后台接收数据
+				//---->后台连接数据库,并更新数据库的内容--->将结果返回给后台
+				//--->后台将结果返回给前端--->根据不同结果作出处理
+				
+				//页面加载时,接收来自list页面发送的email值,根据email值查询对应的用户信息,并显示到edit页面中
+				var loc = location.href;
+  				var n1 = loc.length;//地址的总长度
+  				var n2 = loc.indexOf("=");//取得=号的位置
+				var id = decodeURI(loc.substr(n2+1, n1-n2));//从=号后面的内容
+				$.post('/admin/user/editUserPageInit',{id:id},function(result){
+					$('#usernameFiled').val(result.data.username);
+					$('#emailFiled').val(result.data.email);
+					$('input[value="'+result.data.role+'"]').attr('checked','true');
+					$('input[value="'+result.data.status+'"]').attr('checked','true');
+				})
+				//验证邮箱
+				$('#emailFiled').blur(function(){
+					var emailValue=$('#emailFiled').val();
+					if(!$('#emailFiled').val()){
+						$('.message-email').html('邮箱不能为空').css('color','red');
+						$('.btn-primary').attr('disabled',true);
+					}else if(!$('#emailFiled').val().match(/^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+((\.[a-zA-Z0-9_-]{2,3}){1,2})$/)){
+						$('.message-email').html('邮箱格式不正确').css('color','red');
+						$('btn-primary').attr('disabled',true);
+					}else{
+						//寻找除当前id以外的邮箱,和输入的邮箱作比较;
+						//如果和输入的邮箱相同,则不能修改,需更换.如果不一样,则可以更改为这个输入的邮箱.
+						$.post('/admin/user/getUserEmailNum',{id:id},function(result){
+							if(result.data && emailValue===result.data){
+								$('.message-email').html('该邮箱已经存在').css('color','red');
+								$('btn-primary').attr('disabled',true);
+							}else{
+								$('.message-email').html('');
+								$('btn-primary').attr('disabled',false);
+							}	
+						},'json');
+						$('btn-primary').attr('disabled',false);
+					}
+				});
+				//编辑后点击确定向后台发送修改后的数据--->后台接收数据保存到数据库
+				//--->返回保存结果给前端--->前端进行页面渲染
+				$('.btn-save').click(function(){
+					var username=$.trim($('#usernameFiled').val());
+					var email=$.trim($('#emailFiled').val());
+					var role=$('input[name="role"]:checked').val();
+					var status=$('input[name="status"]:checked').val();
+					$.post('/admin/user/editUserSave',{
+						username:username,
+						email:email,
+						role:role,
+						status:status,
+						id:id	
+					},function(result){
+						if(result.success==='success'){
+							alert(result.data);
+							window.location.href='/admin/user/list';
+						}
+					})
+					return false;
+				})
+				$('.btn-cancel').click(function(){
+					window.location.href='/admin/user/list';
+					return false;
+				});
+			})
+			
+			
+		</script>	
+</body>
+</html>
+
